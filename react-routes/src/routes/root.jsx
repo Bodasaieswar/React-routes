@@ -29,6 +29,9 @@ export default function Root() {
 	const { contacts, q } = useLoaderData();
 	const navigation = useNavigation();
 	const submit = useSubmit();
+	const searching =
+		navigation.location &&
+		new URLSearchParams(navigation.location.search).has('q');
 	useEffect(() => {
 		document.getElementById('q').value = q;
 	}, [q]);
@@ -44,12 +47,16 @@ export default function Root() {
 						<input
 							id="q"
 							aria-label="Search contacts"
+							className={searching ? 'loading' : ''}
 							placeholder="Search"
 							type="search"
 							name="q"
 							defaultValue={q}
 							onChange={(event) => {
-								submit(event.currentTarget.form);
+								const isFirstSearch = q == null;
+								submit(event.currentTarget.form, {
+									replace: !isFirstSearch,
+								});
 							}}
 						/>
 						<div
