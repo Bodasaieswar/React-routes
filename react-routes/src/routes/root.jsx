@@ -6,15 +6,17 @@ import {
 	redirect,
 	NavLink,
 	useNavigation,
+	useSubmit,
 } from 'react-router-dom';
 import { getContacts, createContact } from '../contact';
+import { useEffect } from 'react';
 
 export async function loader({ request }) {
 	const url = new URL(request.url);
 	const q = url.searchParams.get('q');
 	const contacts = await getContacts(q);
 	// const contacts = await getContacts();
-	return { contacts };
+	return { contacts, q };
 }
 
 export async function action() {
@@ -24,8 +26,12 @@ export async function action() {
 }
 
 export default function Root() {
-	const { contacts } = useLoaderData();
+	const { contacts, q } = useLoaderData();
 	const navigation = useNavigation();
+	const submit = useSubmit();
+	useEffect(() => {
+		document.getElementById('q').value = q;
+	}, [q]);
 	return (
 		<>
 			<div id="sidebar">
@@ -41,6 +47,10 @@ export default function Root() {
 							placeholder="Search"
 							type="search"
 							name="q"
+							defaultValue={q}
+							onChange={(event) => {
+								submit(event.currentTarget.form);
+							}}
 						/>
 						<div
 							id="search-spinner"
